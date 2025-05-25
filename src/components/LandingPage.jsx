@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { FaRegThumbsUp, FaRocket, FaPhoneAlt, FaShieldAlt } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  FaRegThumbsUp,
+  FaRocket,
+  FaPhoneAlt,
+  FaShieldAlt,
+} from "react-icons/fa";
 import { motion } from "framer-motion";
 import Marquee from "react-fast-marquee";
-import { project1, project2, project3, bg1, bg2, bg3 } from "../data"; // Assuming images are defined in data.js
+import { project1, project2, project3, bg1, bg2, bg3 } from "../data";
 
 const LandingPage = () => {
   const [bgIndex, setBgIndex] = useState(0);
   const [prevBgIndex, setPrevBgIndex] = useState(0);
   const backgrounds = [bg1, bg2, bg3];
+  const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -17,6 +23,42 @@ const LandingPage = () => {
     }, 5000);
     return () => clearInterval(interval);
   }, [bgIndex]);
+
+  useEffect(() => {
+    const fetchMyData = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.warn("No token found...");
+        return;
+      }
+
+      try {
+        const response = await fetch(`https://chatboxbackend-89xz.onrender.com/me`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          console.log("my data:\n", data);
+          if(data.role==="user"){
+            navigate('/home');
+          }
+        } else {
+          console.error("Failed to fetch my data:", data);
+        }
+      } catch (err) {
+        console.error("Error fetching my data history:", err);
+      }
+    };
+
+    fetchMyData();
+  }, []);
 
   return (
     <div className="bg-[#0f172a] text-white">
@@ -28,8 +70,8 @@ const LandingPage = () => {
             className="absolute inset-0"
             style={{
               backgroundImage: `url(${bg})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
+              backgroundSize: "cover",
+              backgroundPosition: "center",
               zIndex: index === bgIndex ? 20 : 10,
             }}
             initial={{ opacity: 0 }}
@@ -48,9 +90,12 @@ const LandingPage = () => {
           transition={{ duration: 1 }}
           className="relative z-40"
         >
-          <h1 className="text-5xl font-extrabold mb-4 px-12">Revolutionizing Communication</h1>
+          <h1 className="text-5xl font-extrabold mb-4 px-12">
+            Revolutionizing Communication
+          </h1>
           <p className="text-xl mb-8 px-20">
-            Create an account, verify with your phone, and start connecting with anyone, anywhere—without using a SIM card.
+            Create an account, verify with your phone, and start connecting with
+            anyone, anywhere—without using a SIM card.
           </p>
           <div className="px-8">
             <Link
@@ -81,7 +126,10 @@ const LandingPage = () => {
           >
             <FaRocket className="text-4xl text-blue-400 mb-4" />
             <h3 className="text-xl font-semibold mb-2">Fast & Reliable</h3>
-            <p className="text-gray-300">Connect instantly with anyone, anywhere. Lightning-fast connection speeds.</p>
+            <p className="text-gray-300">
+              Connect instantly with anyone, anywhere. Lightning-fast connection
+              speeds.
+            </p>
           </motion.div>
 
           <motion.div
@@ -92,7 +140,10 @@ const LandingPage = () => {
           >
             <FaShieldAlt className="text-4xl text-green-400 mb-4" />
             <h3 className="text-xl font-semibold mb-2">Secure & Private</h3>
-            <p className="text-gray-300">Your privacy is our top priority. We ensure end-to-end encryption for all communications.</p>
+            <p className="text-gray-300">
+              Your privacy is our top priority. We ensure end-to-end encryption
+              for all communications.
+            </p>
           </motion.div>
 
           <motion.div
@@ -103,7 +154,10 @@ const LandingPage = () => {
           >
             <FaPhoneAlt className="text-4xl text-yellow-400 mb-4" />
             <h3 className="text-xl font-semibold mb-2">No SIM Card Needed</h3>
-            <p className="text-gray-300">Say goodbye to SIM cards. Communicate using a unique ID and phone number.</p>
+            <p className="text-gray-300">
+              Say goodbye to SIM cards. Communicate using a unique ID and phone
+              number.
+            </p>
           </motion.div>
 
           <motion.div
@@ -114,26 +168,33 @@ const LandingPage = () => {
           >
             <FaRegThumbsUp className="text-4xl text-red-400 mb-4" />
             <h3 className="text-xl font-semibold mb-2">User-Friendly</h3>
-            <p className="text-gray-300">Our platform is intuitive, making it easy for you to connect with anyone in just a few clicks.</p>
+            <p className="text-gray-300">
+              Our platform is intuitive, making it easy for you to connect with
+              anyone in just a few clicks.
+            </p>
           </motion.div>
         </div>
       </section>
 
       {/* Image Slider Section */}
       <section className="bg-[#0f172a] py-20">
-        <h2 className="text-4xl font-bold text-white mb-8 text-center">Our Work</h2>
+        <h2 className="text-4xl font-bold text-white mb-8 text-center">
+          Our Work
+        </h2>
         <div className="overflow-hidden">
           <Marquee>
-            {[project1, project2, project3, project1, project2, project3].map((src, index) => (
-              <motion.img
-                key={index}
-                src={src}
-                alt={`Project ${index + 1}`}
-                className="w-72 h-48 object-cover rounded-lg shadow-lg ml-5"
-                whileHover={{ scale: 1.1 }}
-                transition={{ duration: 0.3 }}
-              />
-            ))}
+            {[project1, project2, project3, project1, project2, project3].map(
+              (src, index) => (
+                <motion.img
+                  key={index}
+                  src={src}
+                  alt={`Project ${index + 1}`}
+                  className="w-72 h-48 object-cover rounded-lg shadow-lg ml-5"
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.3 }}
+                />
+              )
+            )}
           </Marquee>
         </div>
       </section>
@@ -148,7 +209,10 @@ const LandingPage = () => {
         >
           Ready to get started?
         </motion.h2>
-        <p className="text-xl mb-8">Join us today and take the first step towards a new way of communication.</p>
+        <p className="text-xl mb-8">
+          Join us today and take the first step towards a new way of
+          communication.
+        </p>
         <Link
           to="/signup"
           className="bg-blue-600 hover:bg-blue-700 py-3 px-6 rounded-lg text-white font-semibold transition duration-300"

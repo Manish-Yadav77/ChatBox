@@ -66,7 +66,7 @@ const KYCPage = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/send-otp", {
+      const res = await fetch("https://chatboxbackend-89xz.onrender.com/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, phone }),
@@ -92,7 +92,7 @@ const KYCPage = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/verify-otp", {
+      const res = await fetch("https://chatboxbackend-89xz.onrender.com/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),

@@ -15,7 +15,6 @@ import { useRef } from "react";
 const HomePage = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
-  // const [chatMessages, setChatMessages] = useState([]);
   const [showChat, setShowChat] = useState(false);
   const [callHistory, setCallHistory] = useState([]);
   const [loadingCalls, setLoadingCalls] = useState(false);
@@ -42,7 +41,7 @@ const HomePage = () => {
   const [chatLoading, setChatLoading] = useState(true);
 
   const navigate = useNavigate();
-  const { isKycVerified } = useUser();
+  const [selectedName, setSelectedName] = useState(null);
 
   const bottomRef = useRef();
 
@@ -50,7 +49,7 @@ const HomePage = () => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [chatMessages?.messages]);
+  }, [chatMessages]);
 
   const handleReceiverChange = async (value) => {
     setReceiverVirtualNumber(value);
@@ -58,11 +57,10 @@ const HomePage = () => {
     if (value.length === 11) {
       setCheckingNumber(true);
       try {
-        const res = await fetch(`http://localhost:3000/users/exists/${value}`);
+        const res = await fetch(`https://chatboxbackend-89xz.onrender.com/users/exists/${value}`);
         const data = await res.json();
 
         if (data.exists) {
-          console.log("no.verified\n");
           setReceiverExists(true);
           fetchChatHistory(value);
         } else {
@@ -86,7 +84,7 @@ const HomePage = () => {
     setLoadingCalls(true);
     try {
       const response = await fetch(
-        `http://localhost:3000/calls?phoneNumber=${phone}`
+        `https://chatboxbackend-89xz.onrender.com/calls?phoneNumber=${phone}`
       );
       if (!response.ok) throw new Error("Failed to fetch call history");
       const data = await response.json();
@@ -102,14 +100,13 @@ const HomePage = () => {
   const fetchChatHistory = async (receiverNo) => {
     try {
       const res = await fetch(
-        `http://localhost:3000/chats/${user.virtualNumber}/${receiverNo}`
+        `https://chatboxbackend-89xz.onrender.com/chats/${user.virtualNumber}/${receiverNo}`
       );
       const data = await res.json();
       if (res.ok) {
         setReceiverExists(true);
         setChatMessages(data || []);
       }
-      console.log("chat data\n", data);
     } catch (err) {
       console.error("Failed to fetch chat:", err);
       setChatMessages([]);
@@ -142,7 +139,7 @@ const HomePage = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:3000/user/delete", {
+      const response = await fetch("https://chatboxbackend-89xz.onrender.com/user/delete", {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -187,7 +184,7 @@ const HomePage = () => {
     if (!messageText.trim()) return;
 
     try {
-      const res = await fetch("http://localhost:3000/send", {
+      const res = await fetch("https://chatboxbackend-89xz.onrender.com/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -206,10 +203,7 @@ const HomePage = () => {
         handleReceiverChange(phoneNumber);
         setShowChat(true);
 
-        fetchChatHistory(); // you must already have this function
-
-        // Option 2: Append latest message manually
-        // setChatMessages((prev) => [...prev, data.message]);
+        fetchChatHistory();
 
         setMessageText("");
       } else {
@@ -222,7 +216,6 @@ const HomePage = () => {
   };
 
   const fetchChats = async (number) => {
-    console.log("ya...");
     setPhoneNumber(number);
 
     handleReceiverChange(number);
@@ -235,7 +228,7 @@ const HomePage = () => {
       return;
     }
     try {
-      const response = await fetch("http://localhost:3000/api/calls", {
+      const response = await fetch("https://chatboxbackend-89xz.onrender.com/api/calls", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -260,7 +253,7 @@ const HomePage = () => {
     async function fetchUserData() {
       const token = localStorage.getItem("token");
       try {
-        const res = await fetch("http://localhost:3000/me", {
+        const res = await fetch("https://chatboxbackend-89xz.onrender.com/me", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -303,14 +296,12 @@ const HomePage = () => {
 
       try {
         const response = await fetch(
-          `http://localhost:3000/users/chats?number=${virtualNumber}`
+          `https://chatboxbackend-89xz.onrender.com/users/chats?number=${virtualNumber}`
         );
 
         const data = await response.json();
 
         if (response.ok) {
-          console.log("chat number name data\n", data);
-
           setChatHistory(data); // Each item: { number, name }
         } else {
           console.error("Failed to fetch chat history:", data);
@@ -325,8 +316,18 @@ const HomePage = () => {
     fetchChatHistory();
   }, []);
 
-  console.log(chatMessages);
-  
+  useEffect(()=>{
+    const getName = ()=>{
+      chatHistory.map((chat,i)=>{
+        if(selectedNumber===chat.number){
+          setSelectedName(chat.name);
+        }
+      })
+    }
+    getName()
+  },[selectedNumber])
+
+
   return (
     <div className="bg-[#0f172a] text-white min-h-screen flex flex-col">
       {/* Navbar */}
@@ -401,9 +402,6 @@ const HomePage = () => {
             </p>
             <p>
               <strong>Virtual Number:</strong> {user.virtualNumber}
-            </p>
-            <p>
-              <strong>Role:</strong> {user.role}
             </p>
             <p>
               <strong>KYC Status:</strong>{" "}
@@ -490,7 +488,7 @@ const HomePage = () => {
                               if (!currentUser) return;
 
                               await fetch(
-                                "http://localhost:3000/users/save-name",
+                                "https://chatboxbackend-89xz.onrender.com/users/save-name",
                                 {
                                   method: "POST",
                                   headers: {
@@ -577,94 +575,97 @@ const HomePage = () => {
 
           {/* Chat Input */}
           {showChat && phoneNumber.length === 11 && (
-            <>
-              {selectedNumber && receiverExists && (
-                <h3 className="text-xl text-center font-semibold mb-2 text-yellow-300">
-                  Chatting with:{" "}
-                  <span className="text-white">
-                    {chatMessages?.chat?.savedNames?.[user.virtualNumber] || selectedNumber}
+  <>
+    {selectedNumber && receiverExists && (
+      <h3 className="text-xl text-center font-semibold mb-2 text-yellow-300">
+        Chatting with:{" "}
+        <span className="text-white">
+          {selectedName ? selectedName : selectedNumber}
+        </span>
+      </h3>
+    )}
 
-                  </span>
-                </h3>
-              )}
+    {receiverExists ? (
+      <>
+        <div
+          className="bg-gray-700 h-[400px] overflow-y-auto rounded-lg p-4 space-y-3 shadow-inner scroll-smooth"
+          onScroll={(e) => {
+            // Optional: You can track if user scrolled up here if needed
+          }}
+        >
+          {!chatMessages?.chat ? (
+            <p className="text-center text-gray-400">Loading chat...</p>
+          ) : chatMessages.chat.messages?.length === 0 ? (
+            <p className="text-center text-gray-500">
+              No messages yet. Start the conversation!
+            </p>
+          ) : (
+            chatMessages.chat.messages.map((msg, index) => {
+              const isSender = msg.senderVirtualNumber === user.virtualNumber;
 
-              {receiverExists ? (
-                <>
-                  <div className="bg-gray-700 h-[400px] overflow-y-auto rounded-lg p-4 space-y-3 shadow-inner scroll-smooth">
-                    {!chatMessages?.chat ? (
-                      <p className="text-center text-gray-400">
-                        Loading chat...
-                      </p>
-                    ) : chatMessages.chat.messages?.length === 0 ? (
-                      <p className="text-center text-gray-500">
-                        No messages yet. Start the conversation!
-                      </p>
-                    ) : (
-                      chatMessages.chat.messages.map((msg, index) => {
-                        const isSender =
-                          msg.senderVirtualNumber === user.virtualNumber;
-
-                        return (
-                          <div
-                            key={index}
-                            className={`flex ${
-                              isSender ? "justify-end" : "justify-start"
-                            }`}
-                          >
-                            <div
-                              className={`max-w-xs p-3 rounded-lg ${
-                                isSender
-                                  ? "bg-blue-500 text-white rounded-br-none"
-                                  : "bg-white text-gray-800 rounded-bl-none border"
-                              }`}
-                            >
-                              <p className="text-sm break-words">
-                                {msg.message}
-                              </p>
-                              <p className="text-xs mt-1 text-right opacity-60">
-                                {new Date(msg.timestamp).toLocaleTimeString(
-                                  [],
-                                  {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  }
-                                )}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })
-                    )}
+              return (
+                <div
+                ref={bottomRef}
+                  key={index}
+                  className={`flex ${isSender ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                    className={`max-w-xs p-3 rounded-lg ${
+                      isSender
+                        ? "bg-blue-500 text-white rounded-br-none"
+                        : "bg-white text-gray-800 rounded-bl-none border"
+                    }`}
+                  >
+                    <p className="text-sm break-words">{msg.message}</p>
+                    <p className="text-xs mt-1 text-right opacity-60">
+                      {new Date(msg.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
                   </div>
-
-                  <div className="mt-4 flex gap-2 items-center">
-                    <input
-                      type="text"
-                      value={messageText}
-                      onChange={(e) => setMessageText(e.target.value)}
-                      placeholder="Type your message..."
-                      className="flex-1 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                      onClick={handleSendMessage}
-                      disabled={!messageText.trim()}
-                      className={`px-4 py-2 rounded-lg text-white ${
-                        messageText.trim()
-                          ? "bg-blue-600 hover:bg-blue-700"
-                          : "bg-gray-400 cursor-not-allowed"
-                      }`}
-                    >
-                      Send
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <p className="text-red-500 mt-4 text-center">
-                  Invalid number. Please enter a valid registered number.
-                </p>
-              )}
-            </>
+                </div>
+              );
+            })
           )}
+          {/* Dummy div to scroll into view */}
+          <div ref={bottomRef} />
+        </div>
+
+        <div className="mt-4 flex gap-2 items-center">
+          <input
+            type="text"
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSendMessage();
+              }
+            }}
+            placeholder="Type your message..."
+            className="flex-1 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={handleSendMessage}
+            disabled={!messageText.trim()}
+            className={`px-4 py-2 rounded-lg text-white ${
+              messageText.trim()
+                ? "bg-blue-600 hover:bg-blue-700"
+                : "bg-gray-400 cursor-not-allowed"
+            }`}
+          >
+            Send
+          </button>
+        </div>
+      </>
+    ) : (
+      <p className="text-red-500 mt-4 text-center">
+        Invalid number. Please enter a valid registered number.
+      </p>
+    )}
+  </>
+)}
+
         </section>
       </main>
     </div>
