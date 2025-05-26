@@ -267,8 +267,8 @@ const HomePage = () => {
           setUser(data);
           setLoadingProfile(true);
         } else {
-          console.log("Data fetch error");
-          console.error("Server Response:", data);
+          alert(data.message);
+          navigate('/login');
         }
       } catch (error) {
         console.error("Fetch Error:", error);
@@ -279,7 +279,8 @@ const HomePage = () => {
     if (token) {
       fetchUserData();
     } else {
-      alert("No token found in localStorage");
+      alert("Login required");
+      navigate('/login');
     }
   }, []);
 

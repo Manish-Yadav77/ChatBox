@@ -5,10 +5,11 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const [load, setLoad] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+    setLoad(true);
     try {
       const res = await fetch("https://chatboxbackend-89xz.onrender.com/login", {
         method: "POST",
@@ -23,9 +24,6 @@ const LoginPage = () => {
       if (res.ok) {
         // Save token (you can also save user info if needed)
         localStorage.setItem("token", data.token);
-
-        // Optionally, save user info too
-        localStorage.setItem("user", JSON.stringify(data.user));
 
         // Redirect to home page or dashboard
         navigate("/home");
@@ -65,8 +63,10 @@ const LoginPage = () => {
               required
             />
           </div>
-          <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded">
-            Login
+          <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:cursor-pointer">
+            {
+              load? 'Loging...' : 'Login'
+            }
           </button>
         </form>
         <p className="text-center pt-5">Don't Have an Account? <Link to='/signup' className="text-blue-600">Click Here</Link></p>

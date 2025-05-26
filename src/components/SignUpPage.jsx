@@ -7,10 +7,11 @@ const SignUpPage = () => {
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");         // Already included
   const navigate = useNavigate();
+  const [load, setLoad] = useState(false)
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-
+    setLoad(true);
     try {
       const res = await fetch("https://chatboxbackend-89xz.onrender.com/register", {
         method: "POST",
@@ -85,8 +86,10 @@ const SignUpPage = () => {
               required
             />
           </div>
-          <button type="submit" className="w-full bg-green-500 text-white py-2 px-4 rounded">
-            Sign Up
+          <button type="submit" className="w-full bg-green-500 text-white py-2 px-4 rounded hover:cursor-pointer">
+            {
+              load? 'Signing Up....' : 'Sign Up'
+            }
           </button>
         </form>
         <p className="text-center pt-5">Already Have an Account? <Link to='/login' className="text-blue-600">Click Here</Link></p>
