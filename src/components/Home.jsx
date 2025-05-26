@@ -380,7 +380,7 @@ const HomePage = () => {
               alt="User Profile"
               className="w-24 h-24 rounded-full border-4 border-yellow-400 shadow-md"
             />
-            <h1 className="text-3xl font-bold mt-4"> John Doe!</h1>
+            <h1 className="text-3xl font-bold mt-4"> {user.name}!</h1>
           </div>
           <p className="text-lg text-gray-300">
             You are logged in and ready to connect.
