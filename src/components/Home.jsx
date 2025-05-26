@@ -553,7 +553,7 @@ const HomePage = () => {
           <h2 className="text-2xl font-semibold mb-4">Start Communication</h2>
           <input
             type="text"
-            placeholder="Enter 10-digit phone number"
+            placeholder="Enter 11-digit phone number"
             value={phoneNumber}
             onChange={handlePhoneNumberChange}
             className="w-full p-3 rounded bg-gray-800 text-white placeholder-gray-400"
