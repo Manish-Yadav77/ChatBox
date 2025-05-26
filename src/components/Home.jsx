@@ -284,10 +284,20 @@ const HomePage = () => {
     }
   }, []);
 
+  useEffect(()=>{
+    const getName = ()=>{
+      chatHistory.map((chat,i)=>{
+        if(selectedNumber===chat.number){
+          setSelectedName(chat.name);
+        }
+      })
+    }
+    getName()
+  },[selectedNumber])
+
   // fetch chats history but only the number that user's talked...
   useEffect(() => {
-    const fetchChatHistory = async () => {
-      const user = JSON.parse(localStorage.getItem("user"));
+    const fetchChatHistory = async () => {      
       const virtualNumber = user?.virtualNumber;
 
       if (!virtualNumber) {
@@ -315,18 +325,8 @@ const HomePage = () => {
     };
 
     fetchChatHistory();
-  }, []);
+  }, [user]);
 
-  useEffect(()=>{
-    const getName = ()=>{
-      chatHistory.map((chat,i)=>{
-        if(selectedNumber===chat.number){
-          setSelectedName(chat.name);
-        }
-      })
-    }
-    getName()
-  },[selectedNumber])
 
 
   return (
