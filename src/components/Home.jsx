@@ -198,7 +198,15 @@ const HomePage = () => {
     const data = await res.json();
 
     if (res.ok) {
-      setMessageText(""); // Clear input
+      handleReceiverChange(phoneNumber);
+        setShowChat(true);
+
+        fetchChatHistory();
+
+        setMessageText("");
+
+        // poiuytre
+        setMessageText(""); // Clear input
       setShowChat(true); 
       fetchChatHistory();
     } else {
