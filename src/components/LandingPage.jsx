@@ -24,6 +24,7 @@ const LandingPage = () => {
     return () => clearInterval(interval);
   }, [bgIndex]);
 
+  // fetch through the token of users...Data.
   useEffect(() => {
     const fetchMyData = async () => {
       const token = localStorage.getItem("token");

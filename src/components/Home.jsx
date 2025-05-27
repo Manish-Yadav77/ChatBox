@@ -181,39 +181,37 @@ const HomePage = () => {
   };
 
   const handleSendMessage = async () => {
-    if (!messageText.trim()) return;
+  if (!messageText.trim()) return;
 
-    try {
-      const res = await fetch("https://chatboxbackend-89xz.onrender.com/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          senderVirtualNumber: user.virtualNumber,
-          receiverVirtualNumber: phoneNumber,
-          message: messageText,
-        }),
-      });
+  try {
+    const res = await fetch("http://localhost:3000/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        senderVirtualNumber: user.virtualNumber,
+        receiverVirtualNumber: phoneNumber,
+        message: messageText,
+      }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (res.ok) {
-        // Option 1: Re-fetch all messages
-        handleReceiverChange(phoneNumber);
-        setShowChat(true);
-
-        fetchChatHistory();
-
-        setMessageText("");
-      } else {
-        alert("Failed to send message");
-      }
-    } catch (error) {
-      console.error("Message send error:", error);
-      alert("Something went wrong");
+    if (res.ok) {
+      setMessageText(""); // Clear input
+      setShowChat(true);  // Ensure chat is visible
+      // Re-fetch chat history (you already have this function)
+      fetchChatHistory();
+    } else {
+      alert(data.message || "Failed to send message");
     }
-  };
+  } catch (error) {
+    console.error("Message send error:", error);
+    alert("Something went wrong");
+  }
+};
+
 
   const fetchChats = async (number) => {
     setPhoneNumber(number);
@@ -284,6 +282,7 @@ const HomePage = () => {
     }
   }, []);
 
+  // for getting name...
   useEffect(()=>{
     const getName = ()=>{
       chatHistory.map((chat,i)=>{
@@ -326,6 +325,41 @@ const HomePage = () => {
 
     fetchChatHistory();
   }, [user]);
+
+  // fetch users Data...
+
+  useEffect(() => {
+      const fetchMyData = async () => {
+        const token = localStorage.getItem("token");
+  
+        if (!token) {
+          console.warn("No token found...");
+          return;
+        }
+  
+        try {
+          const response = await fetch(`https://chatboxbackend-89xz.onrender.com/me`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+  
+          const data = await response.json();
+  
+          if (response.ok) {
+            setUser(data);
+          } else {
+            console.error("Failed to fetch my data:", data);
+          }
+        } catch (err) {
+          console.error("Error fetching my data history:", err);
+        }
+      };
+  
+      fetchMyData();
+    }, []);
 
 
 
@@ -483,9 +517,7 @@ const HomePage = () => {
                           />
                           <button
                             onClick={async () => {
-                              const currentUser = JSON.parse(
-                                localStorage.getItem("user")
-                              )?.virtualNumber;
+                              const currentUser = user?.virtualNumber;
                               if (!currentUser) return;
 
                               await fetch(
@@ -589,11 +621,7 @@ const HomePage = () => {
     {receiverExists ? (
       <>
         <div
-          className="bg-gray-700 h-[400px] overflow-y-auto rounded-lg p-4 space-y-3 shadow-inner scroll-smooth"
-          onScroll={(e) => {
-            // Optional: You can track if user scrolled up here if needed
-          }}
-        >
+          className="bg-gray-700 h-[400px] overflow-y-auto rounded-lg p-4 space-y-3 shadow-inner scroll-smooth">
           {!chatMessages?.chat ? (
             <p className="text-center text-gray-400">Loading chat...</p>
           ) : chatMessages.chat.messages?.length === 0 ? (
