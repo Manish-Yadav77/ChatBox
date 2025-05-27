@@ -205,7 +205,7 @@ const HomePage = () => {
 
         setMessageText("");
 
-        // poiuytre
+        // Extra for safty...
         setMessageText(""); // Clear input
       setShowChat(true); 
       fetchChatHistory();
