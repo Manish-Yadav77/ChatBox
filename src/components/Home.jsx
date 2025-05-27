@@ -126,7 +126,6 @@ const HomePage = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
     navigate("/");
     console.log("User logged out");
   };
@@ -200,8 +199,7 @@ const HomePage = () => {
 
     if (res.ok) {
       setMessageText(""); // Clear input
-      setShowChat(true);  // Ensure chat is visible
-      // Re-fetch chat history (you already have this function)
+      setShowChat(true); 
       fetchChatHistory();
     } else {
       alert(data.message || "Failed to send message");
