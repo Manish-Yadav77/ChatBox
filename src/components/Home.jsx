@@ -369,6 +369,7 @@ const HomePage = () => {
 
 
 
+
   return (
     <div className="bg-[#0f172a] text-white min-h-screen flex flex-col">
       {/* Navbar */}
@@ -421,11 +422,8 @@ const HomePage = () => {
               alt="User Profile"
               className="w-24 h-24 rounded-full border-4 border-yellow-400 shadow-md"
             />
-            <h1 className="text-3xl font-bold mt-4"> {user.name}!</h1>
+            <h1 className="text-3xl font-bold mt-4"> { user.name ? user.name?.charAt(0).toUpperCase() + user.name?.slice(1).toLowerCase() : ''}</h1>
           </div>
-          <p className="text-lg text-gray-300">
-            You are logged in and ready to connect.
-          </p>
         </section>
 
         {/* Profile */}
