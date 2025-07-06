@@ -230,6 +230,7 @@ const HomePage = () => {
     if (!phoneNumber) {
       alert("Please enter a valid phone number.");
       return;
+      
     }
     try {
       const response = await fetch("https://chatboxbackend-89xz.onrender.com/api/calls", {
